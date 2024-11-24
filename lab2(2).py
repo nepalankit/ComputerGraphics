@@ -28,6 +28,7 @@ def bresenham_line(x0, y0, x1, y1):
 
         if p < 0:  # If P_k < 0
             p += 2 * dy  # Update P_k+1 = P_k + 2Δy
+            x0 += sx  # x_i+1 = x_i + 1
         else:  # If P_k >= 0
             y0 += sy  # y_i+1 = y_i + 1
             p += 2 * dy - 2 * dx  # Update P_k+1 = P_k + 2Δy - 2Δx

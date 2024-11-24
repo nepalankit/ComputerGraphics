@@ -25,7 +25,7 @@ def initialize_glfw():
 
 # Function to draw a circle
 def draw_circle(radius, segments):
-    glBegin(GL_TRIANGLE_FAN)
+    glBegin(GL_TRIANGLE_FAN) #circle by drawing multiple connected triangles.
     glVertex2f(0, 0)  # Center point
     for i in range(segments + 1):
         theta = 2.0 * pi * i / segments

@@ -1,7 +1,7 @@
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
-
+#Digital Differential Analyzer
 # Global variables for points
 point1 = None
 point2 = None
@@ -25,7 +25,7 @@ def dda_line(x0, y0, x1, y1):
     x, y = x0, y0
 
     # Begin OpenGL drawing
-    glBegin(GL_POINTS)
+    glBegin(GL_POINTS) #rendering points
     for _ in range(int(step_size) + 1):  # Include both start and end points
         glVertex2f(round(x), round(y))  # Plot the current point
         x += x_inc  # Increment x
