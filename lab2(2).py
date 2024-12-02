@@ -30,9 +30,9 @@ def bresenham_line(x0, y0, x1, y1):
             p += 2 * dy  # Update P_k+1 = P_k + 2Δy
             x0 += sx  # x_i+1 = x_i + 1
         else:  # If P_k >= 0
-            y0 += sy  # y_i+1 = y_i + 1
             p += 2 * dy - 2 * dx  # Update P_k+1 = P_k + 2Δy - 2Δx
-        x0 += sx  # x_i+1 = x_i + 1
+            y0 += sy  # y_i+1 = y_i + 1
+            x0 += sx  # x_i+1 = x_i + 1
 
 
     else:  # Case: |m| >= 1
@@ -44,10 +44,11 @@ def bresenham_line(x0, y0, x1, y1):
 
         if p < 0:  # If P_k < 0
             p += 2 * dx  # Update P_k+1 = P_k + 2Δx
+            y0 += sy  # y_i+1 = y_i + 1
         else:  # If P_k >= 0
-            x0 += sx  # x_i+1 = x_i + 1
             p += 2 * dx - 2 * dy  # Update P_k+1 = P_k + 2Δx - 2Δy
-        y0 += sy  # y_i+1 = y_i + 1
+            x0 += sx  # x_i+1 = x_i + 1
+            y0 += sy  # y_i+1 = y_i + 1
 
 
     # Plot the final point

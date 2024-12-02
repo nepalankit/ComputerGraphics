@@ -39,7 +39,7 @@ def midpoint_circle(x_center, y_center, radius):
             # Choose the pixel diagonally below
             y -= 1
             x += 1
-            d += 2 * (x - y) + 5
+            d += 2 * (x - y) + 1
         plot_circle_points(x_center, y_center, x, y)
 
 # Function to draw axes

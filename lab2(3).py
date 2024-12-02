@@ -3,95 +3,102 @@ from OpenGL.GLUT import *
 from OpenGL.GLU import *
 
 # Constants
-WINDOW_WIDTH = 800
-WINDOW_HEIGHT = 600
-BAR_THICKNESS = 30  # Increased bar thickness
+WINDOW_WIDTH = 800  # Width of the OpenGL window
+WINDOW_HEIGHT = 600  # Height of the OpenGL window
 
-# Data for histogram
-frequencies = [30, 50, 20, 60, 40, 70, 10, 35, 45, 55]
+# Data for the graph
+frequencies = [30, 50, 20, 60, 40, 70, 10, 35, 45, 55]  # Sample data points
 
-# Colors for histogram bars (normalized to 0-1 for OpenGL)
-BAR_COLORS = [
-    (0.55, 0.07, 0.72), (0.2, 0.24, 0.58), (0.0, 0.5, 0.0),
-    (1.0, 0.27, 0.0), (1.0, 0.84, 0.0), (1.0, 0.08, 0.58),
-    (0.0, 0.75, 1.0), (1.0, 0.41, 0.7), (0.5, 0.5, 0.5),
-    (0.0, 0.0, 0.0)
-]
+# Color for the line graph (normalized RGB values for OpenGL)
+LINE_COLOR = (0.2, 0.6, 0.8)  # Light blue color
 
 def dda_line(x1, y1, x2, y2, color):
     """
-    Draws a line using the DDA algorithm.
+    Draws a line using the DDA (Digital Differential Analyzer) algorithm.
     Args:
         x1, y1: Starting coordinates of the line
         x2, y2: Ending coordinates of the line
         color: The color to draw the line in (tuple of RGB values)
     """
+    # Calculate differences and the number of steps
     dx = x2 - x1
     dy = y2 - y1
-    steps = max(abs(dx), abs(dy))
+    steps = max(abs(dx), abs(dy))  # Choose the larger of dx or dy for smooth plotting
+
+    # Prevent division by zero in case of no steps
     if steps == 0:
         return
+
+    # Calculate the increments for each step
     x_inc = dx / steps
     y_inc = dy / steps
+
+    # Starting position
     x = x1
     y = y1
+
+    # Loop through each step and draw a point
     for _ in range(int(steps)):
-        glColor3f(*color)
+        glColor3f(*color)  # Set the color of the point
         glBegin(GL_POINTS)
-        glVertex2f(int(x), int(y))
+        glVertex2f(int(x), int(y))  # Draw the point at the current position
         glEnd()
-        x += x_inc
-        y += y_inc
+        x += x_inc  # Increment x by the calculated amount
+        y += y_inc  # Increment y by the calculated amount
 
-def draw_bar(x, y, height, color):
+def draw_line_graph():
     """
-    Draws a single vertical bar using DDA line algorithm.
-    The bar thickness is now effectively controlled by drawing several points vertically.
+    Draws a line graph by connecting data points using the DDA algorithm.
     """
-    for i in range(BAR_THICKNESS):
-        dda_line(x + i, y, x + i, y + height, color)  # Slightly offset the x to make it thicker
+    # Calculate spacing between points on the x-axis
+    point_spacing = (WINDOW_WIDTH - 100) / (len(frequencies) - 1)  # Subtract margin
 
-def draw_histogram():
-    """
-    Draws the histogram bars using DDA for each bar.
-    """
-    ##This function iterates over frequencies and uses draw_bar to draw each bar on the screen.
-    x = 10  # Starting x-coordinate for the bars
+    # Determine scaling for y-axis based on maximum frequency
     max_freq = max(frequencies)
-    for freq, color in zip(frequencies, BAR_COLORS):
-        # Scale the bar height to fit the window
-        bar_height = freq * (WINDOW_HEIGHT - 100) / max_freq
-        draw_bar(x, 50, bar_height, color)
-        x += BAR_THICKNESS + 10  # Space between bars
+    y_scale = (WINDOW_HEIGHT - 100) / max_freq  # Subtract margin for top and bottom
+
+    # Initial x and y positions
+    x = 50  # Starting x-coordinate (with margin)
+    prev_x, prev_y = x, 50 + frequencies[0] * y_scale  # Calculate the first point's position
+
+    # Loop through frequencies and draw lines between consecutive points
+    for freq in frequencies[1:]:
+        x += point_spacing  # Move to the next x-coordinate
+        y = 50 + freq * y_scale  # Calculate the scaled y-coordinate
+        dda_line(prev_x, prev_y, x, y, LINE_COLOR)  # Draw a line from the previous point to the current point
+        prev_x, prev_y = x, y  # Update the previous point for the next line segment
 
 def display():
     """
     OpenGL display callback function.
+    Clears the screen and draws the line graph.
     """
-    glClear(GL_COLOR_BUFFER_BIT)
-    draw_histogram()
-    glFlush()
+    glClear(GL_COLOR_BUFFER_BIT)  # Clear the screen
+    draw_line_graph()  # Call the function to draw the graph
+    glFlush()  # Ensure all OpenGL commands are executed
 
 def init():
     """
-    Initialize the OpenGL environment.
+    Initializes the OpenGL environment.
+    Sets up the projection, background color, and coordinate system.
     """
-    glClearColor(1.0, 1.0, 1.0, 1.0)  # White background
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    gluOrtho2D(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT)
+    glClearColor(1.0, 1.0, 1.0, 1.0)  # Set the background color to white
+    glMatrixMode(GL_PROJECTION)  # Set the matrix mode to projection
+    glLoadIdentity()  # Reset the projection matrix
+    gluOrtho2D(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT)  # Define the 2D orthographic projection
 
 def main():
     """
-    Main function to set up the OpenGL application.
+    Main function to set up and run the OpenGL application.
     """
-    glutInit()
-    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB)
-    glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT)
-    glutCreateWindow(b"Histogram using DDA")
-    init()
-    glutDisplayFunc(display)
-    glutMainLoop()
+    glutInit()  # Initialize GLUT
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB)  # Set display mode (single buffer, RGB color)
+    glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT)  # Set window size
+    glutCreateWindow(b"Line Graph using DDA")  # Create the window with a title
+    init()  # Initialize the OpenGL environment
+    glutDisplayFunc(display)  # Register the display callback function
+    glutMainLoop()  # Start the main event loop
 
+# Run the application
 if __name__ == "__main__":
     main()
